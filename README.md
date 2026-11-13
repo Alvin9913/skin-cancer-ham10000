@@ -28,6 +28,46 @@ What the numbers say:
 - **Focal loss with a frozen backbone is unstable** — B2 has the widest spread (melanoma recall 59.0 ± 13.8) and the lowest accuracy. Focal loss needs the backbone to adapt with it.
 - **C is the compromise.** 75.8 accuracy and 71.3 melanoma recall — if you will not accept a 7-point accuracy drop, weighted CE is the better lever.
 
+## Extra analyses
+
+`06_extras.py` reruns the same seeds for three more questions: does the focal-loss gain depend on gamma, are the probabilities usable as probabilities, and how does the model behave at a fixed sensitivity target.
+
+**Gamma is not the lever.** Track B at gamma = 1 and 3, five seeds each, against the shipped gamma = 2:
+
+| gamma | Acc | Malignant recall | Melanoma recall | Macro F1 | Macro AUROC |
+|---|---|---|---|---|---|
+| 1 | 75.0 ± 5.0 | 82.8 ± 4.3 | 70.8 ± 7.6 | 65.3 ± 4.8 | 94.6 ± 0.8 |
+| 2 (Track B) | 73.0 ± 3.5 | 86.0 ± 1.3 | 76.0 ± 2.7 | 64.3 ± 4.4 | 94.2 ± 0.5 |
+| 3 | 74.5 ± 3.2 | 83.6 ± 3.5 | 71.1 ± 5.2 | 65.3 ± 2.9 | 94.3 ± 0.5 |
+
+Every gap here is within one seed standard deviation. Gamma = 2 is best on malignant recall and the tightest across seeds, but I would not claim the sweep proves an effect.
+
+**Calibration is the price of the recall.** Expected calibration error on test, 7-class and malignant-only:
+
+| Track | ECE 7-class | ECE malignant | Brier (malignant) |
+|---|---|---|---|
+| A | 0.034 | 0.069 | 0.118 |
+| B1 | 0.074 | 0.064 | 0.095 |
+| B2 | 0.093 | 0.187 | 0.150 |
+| C | 0.079 | 0.109 | 0.118 |
+| B | 0.038 | 0.146 | 0.126 |
+
+A has the best 7-class ECE (0.034) and Track B is close (0.038). The malignant probability is where focal loss hurts: B 0.146, B2 0.187, against A 0.069 and B1 0.064. If the score is going to be read as a melanoma probability, the extra recall comes with a calibration bill.
+
+**Fixing a sensitivity target makes the trade explicit.** The threshold is selected on validation for a target malignant sensitivity, then applied once to test (mean over five seeds):
+
+| Track | Target sens | Test sens | Test spec | Test precision |
+|---|---|---|---|---|
+| B | 90% | 92.2% | 69.9% | 42.6% |
+| B | 95% | 96.0% | 60.8% | 37.2% |
+| B | 99% | 99.8% | 44.1% | 30.2% |
+| C | 95% | 97.3% | 62.7% | 38.7% |
+| A | 95% | 96.0% | 49.3% | 31.4% |
+
+At 95% sensitivity B keeps more specificity than A (60.8% vs 49.3%), so the recall gain is not handed back at the operating point.
+
+**Where it still fails.** Error decomposition by metadata: on Track A, patients aged 80+ are classified at 27.0% accuracy (37 images) while 40-59 is 76.7%. Track B lifts the 80+ group to 44.9% and the 40-59 group to 77.4%. By class, A sends 35.5% of melanomas to nv; B sends 9.6%, but 25.7% of bkl are now called melanoma. That is the cost of the recall.
+
 ## How the data was split
 
 This part matters more than the model. HAM10000 has multiple images per lesion (`lesion_id`), so a plain random split leaks the same mole into train and test and the score becomes fake.
@@ -50,8 +90,10 @@ I used `StratifiedGroupKFold` grouped by `lesion_id` for a 70/15/15 split, and t
 03_run_experiments.py         5 tracks × 5 seeds, training, evaluation, per-run metrics
 04_polish_plots_and_stats.py  plots and the cross-seed statistics
 05_build_word_report.py       builds the Word report from the metrics
-figures/                      EDA and confusion matrices
-results/                      all_test_results.csv + 25 per-run metric files + splits.csv
+06_extras.py                  gamma sweep, calibration, thresholds, error decomposition, Grad-CAM
+figures/                      EDA, confusion matrices, reliability diagram, Grad-CAM, slide versions
+results/                      all_test_results.csv, splits.csv, 35 per-run metric files, test/validation predictions
+results/extras_*.csv          gamma sweep, calibration, threshold and subgroup tables
 ```
 
 `02_core_modules.py` has a `run_unit_tests()` that checks the dataset shapes and the loss values before any training starts — running that first saved me a few silent failures.
@@ -66,6 +108,14 @@ results/                      all_test_results.csv + 25 per-run metric files + s
 
 ![Confusion matrices](figures/Figure_2_Confusion_Matrices_Polished.png)
 
+**Reliability diagram: predicted confidence vs observed accuracy**
+
+![Reliability](figures/Figure_reliability.png)
+
+**Grad-CAM for Track A and Track B**
+
+![Grad-CAM](figures/Figure_gradcam.png)
+
 ## Environment
 
 ```bash
@@ -74,4 +124,4 @@ pip install torch torchvision timm pandas numpy scikit-learn scipy matplotlib se
 
 The dataset is not in this repo (about 3GB). `01_prepare_data.py` can download it or point at a local folder, and it expects the standard `HAM10000_metadata.csv` + two image folders.
 
-Model weights are not uploaded either (90MB per checkpoint, 25 of them). Run `03_run_experiments.py` to reproduce a track, or load the metrics in `results/` if you only want to see the numbers.
+Model weights are not uploaded either (about 90MB per checkpoint, 35 in total). Run `03_run_experiments.py` to reproduce a track, or load the metrics in `results/` if you only want to see the numbers.

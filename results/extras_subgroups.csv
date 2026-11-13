@@ -1,0 +1,37 @@
+track,attribute,value,n,accuracy_%
+A,localization,abdomen,170,88.5
+A,localization,back,335,69.1
+A,localization,chest,63,57.1
+A,localization,face,97,54.6
+A,localization,foot,48,89.6
+A,localization,hand,18,54.4
+A,localization,lower extremity,327,72.9
+A,localization,neck,21,42.9
+A,localization,scalp,17,29.4
+A,localization,trunk,213,91.0
+A,localization,unknown,34,82.9
+A,localization,upper extremity,151,56.8
+A,age_group,40-59,636,76.7
+A,age_group,60-79,392,57.4
+A,age_group,80+,37,27.0
+A,age_group,<40,424,84.0
+A,sex,female,643,75.9
+A,sex,male,850,70.0
+B,localization,abdomen,170,80.2
+B,localization,back,335,68.2
+B,localization,chest,63,48.6
+B,localization,face,97,61.6
+B,localization,foot,48,81.2
+B,localization,hand,18,74.4
+B,localization,lower extremity,327,76.6
+B,localization,neck,21,55.2
+B,localization,scalp,17,49.4
+B,localization,trunk,213,89.1
+B,localization,unknown,34,79.4
+B,localization,upper extremity,151,62.1
+B,age_group,40-59,636,77.4
+B,age_group,60-79,392,64.5
+B,age_group,80+,37,44.9
+B,age_group,<40,424,76.1
+B,sex,female,643,75.4
+B,sex,male,850,71.0
