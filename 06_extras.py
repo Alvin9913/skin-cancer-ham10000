@@ -1,5 +1,5 @@
 """
-06_extras.py - Final-report extras (run from E:\\Deepseek\\5064-final\\code).
+06_extras.py - Final-report extras (run from the repo root).
 
 Stages
   gamma   : train Track B (Focal + progressive FT) for gamma in {1.0, 3.0} x 5 seeds
@@ -9,8 +9,8 @@ Stages
   errors  : error decomposition by class and by metadata subgroup
   gradcam : Grad-CAM overlays for Track A and Track B
 
-Artifacts go to E:\\Deepseek\\5064-final\\outputs and ...\\figures.
-Source checkpoints / test predictions are read from E:\\Code\\SkinCancer_HAM10000\\outputs (read-only).
+Artifacts go to outputs/ and figures/ inside the repo.
+Source checkpoints / test predictions are read from outputs/ (override with SKIN_DATA_ROOT).
 """
 import os
 import sys
@@ -29,8 +29,11 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from PIL import Image
 
-SRC = r"E:\Code\SkinCancer_HAM10000"
-OUT = r"E:\Code\SkinCancer_HAM10000"
+ROOT = os.path.dirname(os.path.abspath(__file__))
+# 数据与权重的根目录：默认就是本仓库；指向别处就设环境变量 SKIN_DATA_ROOT
+ROOT = os.environ.get("SKIN_DATA_ROOT", ROOT)
+SRC = ROOT
+OUT = ROOT
 OUT_OUTPUTS = os.path.join(OUT, "outputs")
 OUT_FIG = os.path.join(OUT, "figures")
 OUT_METRICS = os.path.join(OUT_OUTPUTS, "metrics")

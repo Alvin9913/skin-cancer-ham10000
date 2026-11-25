@@ -119,7 +119,8 @@ results/extras_*.csv          gamma sweep, calibration, threshold and subgroup t
 ## Environment
 
 ```bash
-pip install torch torchvision timm pandas numpy scikit-learn scipy matplotlib seaborn
+python -m venv .venv && source .venv/bin/activate
+pip install -r requirements.txt
 ```
 
 The dataset is not in this repo (about 3GB). `01_prepare_data.py` can download it or point at a local folder, and it expects the standard `HAM10000_metadata.csv` + two image folders.
