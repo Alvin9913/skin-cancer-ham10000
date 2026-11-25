@@ -7,8 +7,8 @@ from docx.oxml import OxmlElement
 from docx.oxml.ns import qn
 
 # ======= 请在这里直接填入你的真实学号与课程代码 =======
-AUTHOR_NAME = "Zhipeng Zhang"
-STUDENT_ID = "a1990000"       # <-- 替换为你的真实 Student ID
+AUTHOR_NAME = os.environ.get("REPORT_AUTHOR", "Zhipeng Zhang")
+STUDENT_ID = os.environ.get("REPORT_STUDENT_ID", "")  # set via env when building a submission copy
 COURSE_CODE = "AIML-XXXX"     # <-- 替换为你的真实 Course Code
 # ====================================================
 

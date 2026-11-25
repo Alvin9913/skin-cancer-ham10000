@@ -1,4 +1,4 @@
-﻿data/
+data/
 outputs/
 checkpoints/
 __pycache__/
@@ -8,3 +8,4 @@ __pycache__/
 *.pth
 .DS_Store
 *.log
+.venv/

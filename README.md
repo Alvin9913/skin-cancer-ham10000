@@ -126,3 +126,7 @@ pip install -r requirements.txt
 The dataset is not in this repo (about 3GB). `01_prepare_data.py` can download it or point at a local folder, and it expects the standard `HAM10000_metadata.csv` + two image folders.
 
 Model weights are not uploaded either (about 90MB per checkpoint, 35 in total). Run `03_run_experiments.py` to reproduce a track, or load the metrics in `results/` if you only want to see the numbers.
+
+## License
+
+MIT — see [LICENSE](LICENSE).
